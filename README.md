@@ -1,38 +1,107 @@
-LANGCHAIN
+# Weather API Agent
 
-What is LangChain and Why You Need It
+An intelligent AI agent that answers queries using local Ollama models and can fetch real-time weather data via OpenWeatherMap API or search the web using DuckDuckGo.
 
+## Features
 
-The Problem I Didn’t Know I Had (Until I Found the Solution)
-So there I was, feeling pretty proud of myself after getting my first OpenAI API calls working. I had visions of building all sorts of cool AI applications. Then reality hit me like a truck.
+- **Local AI Model**: Runs on Ollama (llama3.2) - no cloud API costs
+- **Real-time Weather**: Fetches current weather for any city worldwide
+- **Web Search**: Falls back to DuckDuckGo search for general queries
+- **File Context**: Can read and analyze local files you provide
+- **ReAct Agent**: Autonomously decides which tool to use based on your query
 
-Want to have a conversation with the AI that remembers previous messages? That’s a lot of manual coding to track message history. Want to switch from OpenAI to a local model? Completely different code. Want to connect your AI to external data sources? Good luck writing all that plumbing code yourself.
+## Quick Start
 
-After spending three frustrating days trying to build a simple chatbot that could remember our conversation, I stumbled across something called LangChain. Thirty minutes later, I had rebuilt everything I’d been struggling with — and it was better than what I’d spent days trying to create.
+### 1. Prerequisites
 
-That’s when I realized: LangChain isn’t just helpful, it’s absolutely essential for anyone serious about building AI applications.
+```bash
+# Install Ollama
+brew install ollama  # macOS
+# or visit: https://ollama.ai
 
+# Pull the model
+ollama pull llama3.2
 
-1.
-Why I Wish I’d Started with LangChain (Instead of Raw APIs)
-Problem #1: The Provider Lock-In Trap
-When I started building with the OpenAI API directly, I wrote a bunch of code that was specifically designed for OpenAI’s format. Then I wanted to try out a local model to save money, and I realized I’d have to rewrite everything.
+# Start Ollama server
+ollama serve
+```
 
-With raw APIs: Different code for every model With LangChain: Same code, just swap out one class
+### 2. Setup
 
-2.
-Problem #2: The Memory Management Nightmare
-Building a chatbot that remembers your conversation sounds simple until you try to do it. You need to:
+```bash
+# Clone the repo
+git clone https://github.com/gpavankumarnov/whether-api-agent.git
+cd whether-api-agent
 
-Track all previous messages
-Manage conversation length (APIs have limits)
-Handle different message formats
-Decide what to remember and what to forget
+# Copy environment template
+cp .env.example .env
 
-With raw APIs: Dozens of lines of complex memory management code With LangChain: Built-in memory classes that handle everything
+# Add your OpenWeatherMap API key to .env
+# Get free key: https://openweathermap.org/api
+```
 
-3.
-Problem #4: The Integration Puzzle
-Want to connect your AI to a database? Web search? Document processing? Each integration requires learning new APIs and writing custom connection code.
+### 3. Run
 
-With raw APIs: Reinventing the wheel for every data source With LangChain: Pre-built integrations for hundreds of services
+```bash
+# Install dependencies and run
+uv run main.py --query "What's the weather in Delhi?"
+
+# With file context
+uv run main.py --query "Explain this code" --files main.py
+```
+
+## How It Works
+
+```
+User Query
+    ↓
+Agent (Ollama llama3.2)
+    ↓
+Decides which tool to use:
+    ├─ Weather query? → weather_api(city)
+    ├─ General query? → web_search(query)
+    └─ File provided? → Read file context
+    ↓
+Returns formatted answer
+```
+
+### Example Flow
+
+**Query:** "What's the weather in Mumbai?"
+
+1. Agent receives query
+2. Recognizes it's a weather request
+3. Calls `weather_api("Mumbai")`
+4. OpenWeatherMap returns: temp, humidity, wind
+5. Agent formats and presents the answer
+
+## Project Structure
+
+```
+.
+├── main.py           # Main agent logic
+├── .env              # Your API keys (not in git)
+├── .env.example      # Template for .env
+├── pyproject.toml    # Dependencies
+└── README.md         # This file
+```
+
+## Tools Available
+
+| Tool | Purpose | Example |
+|------|---------|---------|
+| `weather_api` | Real-time weather data | "Delhi weather today" |
+| `web_search` | General web search | "Latest Python news" |
+| `read_context_files` | Analyze local files | `--files main.py` |
+
+## Tech Stack
+
+- **LangChain** - Agent framework
+- **LangGraph** - ReAct agent orchestration
+- **Ollama** - Local LLM runtime
+- **OpenWeatherMap API** - Weather data
+- **DuckDuckGo** - Web search
+
+## License
+
+MIT

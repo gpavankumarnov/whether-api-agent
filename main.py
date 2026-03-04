@@ -4,24 +4,14 @@ from pathlib import Path
 from typing import List
 
 import requests
-
-# Import Message types for structured input to the chat model
 from langchain_core.messages import HumanMessage, SystemMessage
-
 from ddgs import DDGS
 from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 from langchain_ollama import ChatOllama
-
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
-
-
-# The OPENAI_API_KEY will be automatically picked up by the ChatOpenAI class
-# from the environment variables loaded by load_dotenv()
-# Make sure your .env file has a line like: OPENAI_API_KEY=your_api_key_here
 
 
 @tool

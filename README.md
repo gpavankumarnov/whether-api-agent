@@ -1,6 +1,30 @@
 # Weather API Agent
 
-An intelligent AI agent that answers queries using local Ollama models and can fetch real-time weather data via OpenWeatherMap API or search the web using DuckDuckGo.
+An intelligent AI agent
+that answers to user queries
+and 
+first it checks from the given files context 
+then search the web using DuckDuckGo
+
+API Integration
+can fetch real-time weather data via OpenWeatherMap API 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Features
 

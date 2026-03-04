@@ -1,0 +1,83 @@
+REST API Documentation
+
+Endpoint: /api/users
+Method: GET
+Description: Retrieve a list of all users
+
+Request:
+GET /api/users HTTP/1.1
+Host: api.example.com
+Authorization: Bearer <token>
+
+Response (200 OK):
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "role": "user"
+    }
+  ],
+  "total": 2
+}
+
+---
+
+Endpoint: /api/users/{id}
+Method: POST
+Description: Create a new user
+
+Request:
+POST /api/users HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "name": "Alice Johnson",
+  "email": "alice@example.com",
+  "password": "securePassword123",
+  "role": "user"
+}
+
+Response (201 Created):
+{
+  "id": 3,
+  "name": "Alice Johnson",
+  "email": "alice@example.com",
+  "role": "user",
+  "created_at": "2026-03-04T10:30:00Z"
+}
+
+---
+
+Endpoint: /api/weather/{city}
+Method: GET
+Description: Get current weather for a city
+
+Request:
+GET /api/weather/Delhi HTTP/1.1
+Host: api.example.com
+API-Key: your_api_key
+
+Response (200 OK):
+{
+  "city": "Delhi",
+  "temperature": 28,
+  "humidity": 45,
+  "conditions": "Clear",
+  "wind_speed": 12
+}
+
+Error Codes:
+- 400: Bad Request - Invalid parameters
+- 401: Unauthorized - Missing or invalid API key
+- 404: Not Found - Resource doesn't exist
+- 500: Internal Server Error - Server-side issue

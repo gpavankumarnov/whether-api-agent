@@ -1,0 +1,37 @@
+Weather Data Analysis Report
+
+Date: March 2026
+Location: Multiple Cities in India
+
+Temperature Records (in Celsius):
+- Delhi: Min 15°C, Max 35°C, Average 25°C
+- Mumbai: Min 22°C, Max 33°C, Average 28°C
+- Bangalore: Min 18°C, Max 30°C, Average 24°C
+- Chennai: Min 24°C, Max 36°C, Average 30°C
+- Kolkata: Min 20°C, Max 34°C, Average 27°C
+
+Rainfall Data (in mm):
+- Delhi: 45mm
+- Mumbai: 120mm
+- Bangalore: 80mm
+- Chennai: 95mm
+- Kolkata: 110mm
+
+Weather Patterns:
+1. Monsoon season typically starts in June
+2. Winter months (December-February) see cooler temperatures
+3. Summer peaks in May with highest temperatures
+4. Coastal cities have higher humidity levels
+
+Climate Zones:
+- Delhi: Semi-arid climate
+- Mumbai: Tropical wet and dry
+- Bangalore: Tropical savanna
+- Chennai: Tropical wet and dry
+- Kolkata: Tropical wet and dry
+
+Key Observations:
+- Temperature variations are significant between day and night in Delhi
+- Mumbai experiences high humidity throughout the year
+- Bangalore has the most pleasant climate year-round
+- Chennai faces extreme heat during summer months

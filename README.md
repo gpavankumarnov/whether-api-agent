@@ -105,3 +105,66 @@ Returns formatted answer
 ## License
 
 MIT
+
+
+
+----------------- Testing --------------------------
+
+
+🧪 Test Scenarios
+
+Scenario 1: Ask about file content
+bash
+uv run main.py --query "What are the main topics covered in this file?" --files test_files/python_basics.txt
+Expected: Agent summarizes Python basics (variables, functions, loops, etc.)
+
+
+
+Scenario 2: Compare weather data with real-time API
+bash
+uv run main.py --query "Compare the Delhi temperature in the file with current weather" --files test_files/weather_data.txt
+Expected: Agent reads file data AND calls weather_api("Delhi") to compare
+
+
+
+
+Scenario 3: Code explanation
+bash
+uv run main.py --query "Explain what this code does and how it works" --files test_files/code_snippet.py
+Expected: Agent analyzes the WeatherAnalyzer class and explains its methods
+
+
+
+Scenario 4: Multiple files
+bash
+uv run main.py --query "What's the relationship between these files?" --files test_files/python_basics.txt test_files/code_snippet.py
+Expected: Agent reads both files and explains how the code uses Python concepts
+
+
+
+Scenario 5: Extract specific info
+bash
+uv run main.py --query "What are the error codes in the API documentation?" --files test_files/api_documentation.txt
+Expected: Agent extracts and lists error codes (400, 401, 404, 500)
+
+
+
+Scenario 6: Weather query without file (baseline)
+bash
+uv run main.py --query "What's the weather in Mumbai today?"
+Expected: Agent uses weather_api tool (no file context needed)
+
+
+
+Scenario 7: General query (web search)
+bash
+uv run main.py --query "What is Python isinstance function?"
+Expected: Agent uses web_search tool or answers from knowledge
+
+
+
+Scenario 8: Combine file + web search
+bash
+uv run main.py --query "Is the API documentation following REST best practices?" --files test_files/api_documentation.txt
+Expected: Agent reads file AND might search web for REST best practices
+

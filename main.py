@@ -32,6 +32,18 @@ def weather_api(city: str) -> str:
     geo_url = "http://api.openweathermap.org/geo/1.0/direct"
     geo_params = {"q": city, "limit": 1, "appid": api_key}
 
+    """
+    User: "Delhi weather"
+    ↓
+Call 1: Geocoding API
+    Input: "Delhi"
+    Output: lat=28.6139, lon=77.2090
+    ↓
+Call 2: Weather API
+    Input: lat=28.6139, lon=77.2090
+    Output: temp=31.43°C, humidity=17%, etc.
+    """
+
     try:
         geo_resp = requests.get(geo_url, params=geo_params, timeout=10)
         geo_resp.raise_for_status()

@@ -12,20 +12,6 @@ can fetch real-time weather data via OpenWeatherMap API
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Features
 
 - **Local AI Model**: Runs on Ollama (llama3.2) - no cloud API costs
@@ -208,3 +194,50 @@ uv run main.py --query "Is the API documentation following REST best practices?"
 
 Expected: Agent reads file AND might search web for REST best practices
 
+
+
+---------------  AI LLM ----------------
+
+
+🏢 What is Groq?
+Groq (the company) was NOT founded by Elon Musk. You might be confusing it with:
+
+Grok (with a "k") - Elon Musk's AI chatbot from xAI
+Groq (with a "q") - A different company that makes AI chips and provides LLM APIs
+Groq Inc. was founded by Jonathan Ross (former Google engineer) and provides:
+
+Fast AI inference hardware (LPU chips)
+Cloud API for running LLMs (Llama, Mixtral, etc.)
+🔄 How Your App Works Now
+When USE_GROQ=true (Deployment):
+python
+llm = ChatGroq(
+    model="llama-3.3-70b-versatile",
+    api_key=api_key
+)
+This means:
+
+Your app sends requests to Groq's cloud API (groq.com)
+Groq runs Meta's Llama 3.3 70B model on their servers
+Results come back to your app
+No Ollama involved - direct API call to Groq
+When USE_GROQ=false (Local):
+python
+llm = ChatOllama(
+    model="llama3.2"
+)
+This means:
+
+Your app connects to Ollama running on your computer (localhost:11434)
+Ollama runs Llama 3.2 locally on your machine
+No Groq involved - completely local
+📊 Comparison
+Aspect	Groq (Cloud)	Ollama (Local)
+Runs where?	Groq's servers	Your computer
+Model	Llama 3.3 70B	Llama 3.2
+Speed	Very fast	Medium
+Cost	Free tier (limited)	Free (unlimited)
+Internet needed?	Yes	No
+Works on deployment?	✅ Yes	❌ No
+🎯 Summary
+Groq = Cloud API service (like OpenAI, but faster and cheaper)

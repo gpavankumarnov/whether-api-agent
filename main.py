@@ -9,6 +9,7 @@ from ddgs import DDGS
 from langchain_core.tools import tool
 from langgraph.prebuilt import create_react_agent
 from langchain_ollama import ChatOllama
+from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
 load_dotenv()

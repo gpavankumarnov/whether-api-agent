@@ -117,7 +117,9 @@ def build_agent():
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             raise ValueError("GROQ_API_KEY not set in environment")
-        llm = ChatGroq(model="llama3-8b-8192", temperature=0.7, api_key=api_key)
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile", temperature=0.7, api_key=api_key
+        )
     else:
         model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
         llm = ChatOllama(model=model_name, temperature=0.7)

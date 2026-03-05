@@ -1,0 +1,10 @@
+langchain-openai
+langchain-core
+langchain-ollama
+langchain
+langgraph
+python-dotenv
+ddgs
+requests
+streamlit
+langchain-groq

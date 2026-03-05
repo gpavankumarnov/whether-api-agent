@@ -110,8 +110,17 @@ def web_search(query: str) -> str:
 
 
 def build_agent():
-    model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
-    llm = ChatOllama(model=model_name, temperature=0.7)
+    use_groq = os.getenv("USE_GROQ", "false").lower() == "true"
+
+    if use_groq:
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY not set in environment")
+        llm = ChatGroq(model="llama3-8b-8192", temperature=0.7, api_key=api_key)
+    else:
+        model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
+        llm = ChatOllama(model=model_name, temperature=0.7)
+
     tools = [weather_api, web_search]
     return create_react_agent(llm, tools)
 

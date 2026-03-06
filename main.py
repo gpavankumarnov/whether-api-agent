@@ -124,7 +124,7 @@ def build_agent():
         model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
         llm = ChatOllama(model=model_name, temperature=0.7)
 
-    tools = [weather_api, web_search]
+    tools = [web_search, weather_api]
     return create_react_agent(llm, tools)
 
 

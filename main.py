@@ -12,7 +12,6 @@ from langgraph.prebuilt import create_react_agent
 from langchain_core.prompts import ChatPromptTemplate
 
 from langchain_ollama import ChatOllama
-from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -101,12 +100,15 @@ Call 2: Weather API
 def web_search(query: str) -> str:
     """Search the web for up-to-date information and return concise results"""
     snippets: list[str] = []
-    with DDGS() as ddgs:
-        for item in ddgs.text(query, max_results=5):
-            title = item.get("title", "")
-            body = item.get("body", "")
-            href = item.get("href", "")
-            snippets.append(f" - {title}\n {body}\n Source:{href}")
+    try:
+        with DDGS(timeout=10) as ddgs:
+            for item in ddgs.text(query, max_results=2):
+                title = item.get("title", "")
+                body = item.get("body", "")[:200]  # Limit body length
+                href = item.get("href", "")
+                snippets.append(f" - {title}\n {body}\n Source:{href}")
+    except Exception as e:
+        return f"Web search failed: {str(e)}"
 
     if not snippets:
         return "No relevant web results found"
@@ -114,23 +116,12 @@ def web_search(query: str) -> str:
 
 
 def build_agent():
-    use_groq = os.getenv("USE_GROQ", "false").lower() == "true"  # Fix here
     tools = [weather_api, web_search]
 
-    if use_groq:
-        api_key = os.getenv("GROQ_API_KEY")
-        if not api_key:
-            raise ValueError("GROQ_API_KEY not set in environment")
-        llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
-            temperature=0,
-            api_key=api_key,
-        )
-    else:
-        model_name1 = os.getenv("OLLAMA_MODEL", "llama3.2")
-        ollama_base = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
+    ollama_base = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
-        llm = ChatOllama(model=model_name1, base_url=ollama_base, temperature=0)
+    llm = ChatOllama(model=model_name, base_url=ollama_base, temperature=0)
 
     return create_react_agent(llm, tools)
 
@@ -188,11 +179,16 @@ TOOLS:
 1. weather_api(city) → get current weather
 2. web_search(query) → search internet
 
-RULES:
-- For weather questions ALWAYS call weather_api.
-- For general knowledge questions call web_search.
-- Always use tools when needed instead of guessing.
-- After receiving tool results, provide a final answer.
+RULES (in priority order):
+1. If files are provided, check them FIRST for the answer.
+2. For weather questions, ALWAYS use weather_api.
+3. For general knowledge questions, you may answer directly if you know the answer.
+4. Only use web_search if:
+   - The answer is not in the provided files
+   - You need recent/current information
+   - You don't know the answer
+5. Keep your responses concise and clear.
+6. After using a tool, provide a final answer immediately.
 
 Return final answers clearly.
 """

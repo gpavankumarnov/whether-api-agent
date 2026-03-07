@@ -114,12 +114,10 @@ def web_search(query: str) -> str:
 
 
 def build_agent():
-    use_groq = os.getenv("USE_GROQ", "false").lower() == "true"
+    use_groq = os.getenv("USE_GROQ", "false").lower() == "true"  # Fix here
     tools = [weather_api, web_search]
 
     if use_groq:
-        # Groq doesn't work well with create_react_agent due to function calling format
-        # Use Ollama on EC2 instead by setting USE_GROQ=false
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             raise ValueError("GROQ_API_KEY not set in environment")
@@ -130,9 +128,10 @@ def build_agent():
         )
     else:
         model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
-        llm = ChatOllama(model=model_name, temperature=0.7)
+        llm = ChatOllama(
+            model=model_name, temperature=0
+        )  # 0.7 recommended for better ReAct
 
-    # Use create_react_agent - works best with Ollama
     return create_react_agent(llm, tools)
 
 

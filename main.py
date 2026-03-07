@@ -114,22 +114,19 @@ def web_search(query: str) -> str:
 
 
 def build_agent():
-    use_groq = os.getenv("USE_GROQ", "false").lower() == "true"
     tools = [weather_api, web_search]
 
-    if use_groq:
-        api_key = os.getenv("GROQ_API_KEY")
-        if not api_key:
-            raise ValueError("GROQ_API_KEY not set in environment")
-        llm = ChatGroq(model="llama3-70b-8192", temperature=0, api_key=api_key)
-        # Bind tools to LLM for OpenAI-style function calling
-        llm_with_tools = llm.bind_tools(tools)
-        return llm_with_tools
-    else:
-        model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
-        llm = ChatOllama(model=model_name, temperature=0.7)
-        # Ollama works with ReAct agent
-        return create_react_agent(llm, tools)
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not set in environment")
+    llm = ChatGroq(
+        model="llama-3.3-70b-versatile",
+        temperature=0,
+        api_key=api_key,
+    )
+
+    # Use create_react_agent for both - it handles tool execution properly
+    return create_react_agent(llm, tools)
 
 
 def parse_args():
@@ -194,20 +191,12 @@ RULES:
 Return final answers clearly.
 """
 
-    use_groq = os.getenv("USE_GROQ", "false").lower() == "true"
     user_message = f"{system_instruction}\n\n user query: \n{args.query}\n\n local file context: \n{file_content}\n\nAnswer the query. use tools when necessary."
 
-    if use_groq:
-        # Groq with bind_tools - direct LLM invocation
-        messages = [HumanMessage(content=user_message)]
-        result = agent.invoke(messages)
-        print("\nFinal response:\n")
-        print(result.content)
-    else:
-        # ReAct agent uses messages pattern
-        result = agent.invoke({"messages": [("user", user_message)]})
-        print("\nFinal response:\n")
-        print(result["messages"][-1].content)
+    # Both Groq and Ollama now use create_react_agent with same invocation pattern
+    result = agent.invoke({"messages": [("user", user_message)]})
+    print("\nFinal response:\n")
+    print(result["messages"][-1].content)
 
 
 if __name__ == "__main__":

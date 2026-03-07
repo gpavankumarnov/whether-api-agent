@@ -20,6 +20,14 @@ can fetch real-time weather data via OpenWeatherMap API
 - **File Context**: Can read and analyze local files you provide
 - **ReAct Agent**: Autonomously decides which tool to use based on your query
 
+
+Summary
+LLM outputs a tool call as part of its response.
+Agent framework detects and executes the tool call.
+Tool output is returned to the LLM for final answer generation.
+
+
+
 ## Quick Start
 
 ### 1. Prerequisites

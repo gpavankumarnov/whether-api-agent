@@ -7,7 +7,12 @@ import requests
 from langchain_core.messages import HumanMessage, SystemMessage
 from ddgs import DDGS
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
+
+# from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_tool_calling_agent
+from langchain.agents import AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate
+
 from langchain_ollama import ChatOllama
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
@@ -117,15 +122,25 @@ def build_agent():
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             raise ValueError("GROQ_API_KEY not set in environment")
-        llm = ChatGroq(
-            model="llama-3.3-70b-versatile", temperature=0.7, api_key=api_key
-        )
+        llm = ChatGroq(model="llama3-70b-8192", temperature=0, api_key=api_key)
     else:
-        model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
+        model_name = os.getenv("OLLAMA_MODEL", "tinyllama")
         llm = ChatOllama(model=model_name, temperature=0.7)
 
     tools = [weather_api, web_search]
-    return create_react_agent(llm, tools)
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", "You are a helpful assistant."),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ]
+    )
+
+    agent = create_tool_calling_agent(llm, tools, prompt)
+    agent_executor = AgentExecutor(agent=agent, tools=tools)
+
+    return agent_executor
 
 
 def parse_args():
@@ -174,12 +189,21 @@ def main():
     file_content = read_context_files(args.files)
     agent = build_agent()
 
-    system_instruction = (
-        "You are an assistant that answers user queries using provided local files first. "
-        "For weather queries, ALWAYS use the weather_api tool with the city name. "
-        "For other information needs, use the web_search tool. "
-        "Always provide a clear final answer and cite sources when tools are used. "
-    )
+    system_instruction = """
+You are an AI assistant with access to tools.
+
+TOOLS:
+1. weather_api(city) → get current weather
+2. web_search(query) → search internet
+
+RULES:
+- For weather questions ALWAYS call weather_api.
+- For general knowledge questions call web_search.
+- Always use tools when needed instead of guessing.
+- After receiving tool results, provide a final answer.
+
+Return final answers clearly.
+"""
 
     user_message = f"{system_instruction}\n\n user query: \n{args.query}\n\n local file context: \n{file_content}\n\nAnswer the query. use tools when necessary."
 

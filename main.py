@@ -8,9 +8,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from ddgs import DDGS
 from langchain_core.tools import tool
 
-# from langgraph.prebuilt import create_react_agent
-from langchain.agents import create_tool_calling_agent
-from langchain.agents import AgentExecutor
+from langgraph.prebuilt import create_react_agent
 from langchain_core.prompts import ChatPromptTemplate
 
 from langchain_ollama import ChatOllama
@@ -117,30 +115,21 @@ def web_search(query: str) -> str:
 
 def build_agent():
     use_groq = os.getenv("USE_GROQ", "false").lower() == "true"
+    tools = [weather_api, web_search]
 
     if use_groq:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             raise ValueError("GROQ_API_KEY not set in environment")
         llm = ChatGroq(model="llama3-70b-8192", temperature=0, api_key=api_key)
+        # Bind tools to LLM for OpenAI-style function calling
+        llm_with_tools = llm.bind_tools(tools)
+        return llm_with_tools
     else:
-        model_name = os.getenv("OLLAMA_MODEL", "tinyllama")
+        model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
         llm = ChatOllama(model=model_name, temperature=0.7)
-
-    tools = [weather_api, web_search]
-
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", "You are a helpful assistant."),
-            ("human", "{input}"),
-            ("placeholder", "{agent_scratchpad}"),
-        ]
-    )
-
-    agent = create_tool_calling_agent(llm, tools, prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools)
-
-    return agent_executor
+        # Ollama works with ReAct agent
+        return create_react_agent(llm, tools)
 
 
 def parse_args():
@@ -205,11 +194,20 @@ RULES:
 Return final answers clearly.
 """
 
+    use_groq = os.getenv("USE_GROQ", "false").lower() == "true"
     user_message = f"{system_instruction}\n\n user query: \n{args.query}\n\n local file context: \n{file_content}\n\nAnswer the query. use tools when necessary."
 
-    result = agent.invoke({"messages": [("user", user_message)]})
-    print("\nFinal response:\n")
-    print(result["messages"][-1].content)
+    if use_groq:
+        # Groq with bind_tools - direct LLM invocation
+        messages = [HumanMessage(content=user_message)]
+        result = agent.invoke(messages)
+        print("\nFinal response:\n")
+        print(result.content)
+    else:
+        # ReAct agent uses messages pattern
+        result = agent.invoke({"messages": [("user", user_message)]})
+        print("\nFinal response:\n")
+        print(result["messages"][-1].content)
 
 
 if __name__ == "__main__":

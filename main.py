@@ -127,10 +127,10 @@ def build_agent():
             api_key=api_key,
         )
     else:
-        model_name = os.getenv("OLLAMA_MODEL", "llama3.2")
-        llm = ChatOllama(
-            model=model_name, temperature=0
-        )  # 0.7 recommended for better ReAct
+        model_name1 = os.getenv("OLLAMA_MODEL", "llama3.2")
+        ollama_base = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+
+        llm = ChatOllama(model=model_name1, base_url=ollama_base, temperature=0)
 
     return create_react_agent(llm, tools)
 

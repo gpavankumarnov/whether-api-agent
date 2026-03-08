@@ -7,7 +7,7 @@ load_dotenv()
 
 st.set_page_config(page_title="Weather Agent AI", page_icon="🌤️", layout="wide")
 
-st.title("🌤️ Weather Agent AI")
+st.title("🌤️ 🧠 DevPilot")
 st.markdown("Ask me anything! I can get weather, search web, or analyze files.")
 
 # Sidebar
